@@ -27,34 +27,6 @@ CONFIG = dict(
 )
 
 
-# ~~GITHUB_REPO_NAME~~
-github_repo_targets = [
-    './Jenkinsfile',
-    './pom.xml',
-    './jenkins/scripts/*',
-    './src/main/resources/logback.xml',
-]
-
-
-# ~~DOMAIN~~
-domain_targets = [
-    './helm/~~GITHUB_REPO_NAME~~/templates/ingress.yaml'
-]
-
-# ~~SUBDOMAIN~~
-subdomain_targets = [
-    './helm/~~GITHUB_REPO_NAME~~/templates/ingress.yaml'
-]
-
-# This is the io.ctl.platform/ folder all source is under
-# First change that folder name
-# ~~SRC_FOLDER~~
-subdomain_targets = [
-    './src/main/java/*'
-]
-
-
-
 def clone_template():
     """ Clone pl-cloud-starter to a temp dir """
 

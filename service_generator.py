@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 
-import os
+import os, sys, glob
 from tempfile import mkdtemp
 from shutil import rmtree
-import glob
 
 
 USER_INSTRUCTIONS = '''
@@ -192,6 +191,10 @@ def print_remaining_tasks():
 
 def main():
 
+    # When executing a script by piping a curl'd file to python3, stdin is opened as a FIFO.
+    # We need to reopen stdin as a tty to accept user input
+    sys.stdin = open("/dev/tty")
+    
     gather_user_input()
 
     clone_template()
@@ -203,4 +206,3 @@ def main():
 
 
 main()
-

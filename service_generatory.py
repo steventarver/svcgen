@@ -51,11 +51,14 @@ CONFIG = dict(
 )
 
 
+def cleanup():
+    """ Remove temporary items """
+    print("{} Removing {}".format(PREFIX, CONFIG['template_source']))
+    rmtree(CONFIG['template_source'])
+
+
 def clone_template():
     """ Clone pl-cloud-starter to a temp dir """
-
-    # TODO: protect against overwriting current dir contents
-
     CONFIG['template_source'] = mkdtemp(prefix='pl-cloud-starter-template')
     print("{} Created temp directory {}".format(PREFIX, CONFIG['template_source']))
 
@@ -77,12 +80,6 @@ def copy_template():
     print("{} Copying template to new GitHub repo {}".format(PREFIX, CONFIG['template_target']))
     template_dir = "{}/pl-cloud-starter/template/{}/".format(CONFIG['template_source'], CONFIG['template_type'])
     os.system("cp -r {} {}".format(template_dir, CONFIG['template_target']))
-
-
-def cleanup():
-    """ Remove temporary items """
-    print("{} Removing {}".format(PREFIX, CONFIG['template_source']))
-    rmtree(CONFIG['template_source'])
 
 
 def gather_user_input():
@@ -171,10 +168,8 @@ def replace_keywords():
     os.system('git add --all')
     os.system("git commit -am 'Initial {} template'".format(CONFIG['template_type']))
 
-    # TODO: move the test package dir
 
-
-def print_remaining_task_list():
+def print_remaining_tasks():
     print("{} Next steps:".format(PREFIX))
     print("     1. Review code and refine naming as necessary")
     print("     2. Run project and test endpoints")
@@ -204,7 +199,7 @@ def main():
     replace_keywords()
 
     cleanup()
-    print_remaining_task_list()
+    print_remaining_tasks()
 
 
 main()

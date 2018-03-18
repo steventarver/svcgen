@@ -111,7 +111,7 @@ def gather_user_input():
 
     ok = input("{} Continue? [Yn]: ".format(PREFIX))
     if ok not in ['y', 'Y', '']:
-        print("{} Exiting at user request".format(PREFIX))
+        print("{} Exiting at your request".format(PREFIX))
         exit(1)
 
 
@@ -125,7 +125,7 @@ def get_file_list(root_dir):
 
 
 def replace_keywords():
-    """ """
+    """ Customize the template using user variables """
     params = {
         '~~GITHUB_REPO_NAME~~': CONFIG['github_repo_name'],
         '~~DOMAIN~~': CONFIG['domain'],

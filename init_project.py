@@ -158,6 +158,12 @@ def replace_keywords():
     base = "src/main/java/io/ctl/{}".format(CONFIG['domain'])
     os.system("mv {}/cloudStarterJava/ {}/{}/".format(base, base, CONFIG['java_package']))
 
+    base = 'src/test/java/io/ctl'
+    os.system("mv {}/platform/ {}/{}/".format(base, base, CONFIG['domain']))
+
+    base = "src/test/java/io/ctl/{}".format(CONFIG['domain'])
+    os.system("mv {}/cloudStarterJava/ {}/{}/".format(base, base, CONFIG['java_package']))
+
     # Rename helm/main to helm/~~GITHUB_REPO_NAME~~
     os.system("mv helm/main helm/{}".format(CONFIG['github_repo_name']))
 

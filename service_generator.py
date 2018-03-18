@@ -65,12 +65,6 @@ def clone_template():
     cwd = os.getcwd()
     os.chdir(CONFIG['template_source'])
     os.system('git clone https://github.com/CenturyLinkCloud/pl-cloud-starter.git')
-
-    # TODO: Remove these 3 lines immediately prior to merge to master
-    print("{} TODO: Remove me: Changing to template branch".format(PREFIX))
-    os.chdir('pl-cloud-starter')
-    os.system('git checkout template')
-
     os.chdir(cwd)
 
 
@@ -194,7 +188,7 @@ def main():
     # When executing a script by piping a curl'd file to python3, stdin is opened as a FIFO.
     # We need to reopen stdin as a tty to accept user input
     sys.stdin = open("/dev/tty")
-    
+
     gather_user_input()
 
     clone_template()

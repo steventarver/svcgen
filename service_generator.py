@@ -102,7 +102,7 @@ def gather_user_input():
     CONFIG['java_package'] = input("{} Enter your java package: ".format(PREFIX))
 
     print("{} Using this configuration:".format(PREFIX))
-    print("     template    : {}".format(CONFIG['template_target']))
+    print("     template    : {}".format(CONFIG['template_type']))
     print("     target dir  : {}".format(CONFIG['template_target']))
     print("     repo name   : {}".format(CONFIG['github_repo_name']))
     print("     domain      : {}".format(CONFIG['domain']))
@@ -110,7 +110,7 @@ def gather_user_input():
     print("     java package: {}".format(CONFIG['java_package']))
 
     ok = input("{} Continue? [Yn]: ".format(PREFIX))
-    if ok not in ['y', 'Y']:
+    if ok not in ['y', 'Y', '']:
         print("{} Exiting at user request".format(PREFIX))
         exit(1)
 

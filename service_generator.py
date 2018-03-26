@@ -120,7 +120,7 @@ def gather_user_input():
 
     CONFIG['domain'] = input("{} Enter your domain: ".format(PREFIX))
     CONFIG['subdomain'] = input("{} Enter your subdomain: ".format(PREFIX))
-    CONFIG['java_package'] = input("{} Enter your java package: ".format(PREFIX))
+    CONFIG['java_package'] = input("{} Enter your java/groovy package: ".format(PREFIX))
 
     print("{} Using this configuration:".format(PREFIX))
     print("     template    : {}".format(CONFIG['template_type']))
@@ -140,7 +140,7 @@ def get_file_list(root_dir):
     """ Return a list of paths to all files in all directories and sub-directories """
     result = []
     for filename in glob.iglob(root_dir + '**/*', recursive=True):
-        if os.path.isfile(filename):
+        if os.path.isfile(filename) and not filename.endswith('.jar'):
             result.append(filename[2:])
     return result
 
@@ -173,6 +173,7 @@ def update_directories():
             lang = 'groovy'
 
         # move platform/cloudstarter to ~~DOMAIN~~/~~JAVA_PACKAGE~~
+        # TODO: trap non-zero exit codes and warn
         base = "src/main/{}/io/ctl".format(lang)
         os.system("mv {}/platform/ {}/{}/".format(base, base, CONFIG['domain']))
 
@@ -231,4 +232,3 @@ def main():
 
 
 main()
-

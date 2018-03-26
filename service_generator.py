@@ -67,6 +67,7 @@ def clone_template():
     os.system('git clone https://github.com/CenturyLinkCloud/pl-cloud-starter.git')
 
     print("{} TODO: Remove after testing. Changing to dev branch".format(PREFIX))
+    os.chdir('pl-cloud-starter')
     os.system('git checkout groovy-generator')
 
     os.chdir(cwd)

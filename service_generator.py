@@ -17,6 +17,7 @@ The following should be true:
  4. I started this script from that new repo directory
 
 Now, we will collect some information to customize your project
+ template:     Which template to use - one of: java-maven, groovy-gradle
  domain:       The domain is a family of services that this service belongs to; the 
                functional area it will target. E.g. billing, network, etc.
                The domain is used to define the java package and ReST paths.
@@ -24,11 +25,11 @@ Now, we will collect some information to customize your project
                may use the main, top level resource collections. 
                E.g. quotes in /billing/quotes, vpn in /network/vpn
                The subdomain is used to define the ReST path.
- java package: This information lets you customize the java package structure.
+ package:      This information lets you customize the java/groovy package structure.
                Source code will be placed in io.ctl.{domain}.{java_package}
 
 If you don't like the resulting package structure, you can:
- 1. Delete all files in this directory except the .git directory and start over.
+ 1. Delete all files in this directory, re-clone your repo, and start over.
  2. Refactor the package paths in your IDE and manually update the path in the
     second host rule in helm/{github_repo_name}/templates/ingress.yaml
 '''
@@ -38,8 +39,7 @@ PREFIX = '===>'
 # User input for template replacement params
 CONFIG = dict(
     github_repo_name = '',
-    # Which template to use - java-maven is the only supported template at the moment
-    template_type = 'java-maven',
+    template_type = '',
     domain = '',
     subdomain = '',
     java_package = '',
@@ -65,7 +65,18 @@ def clone_template():
     cwd = os.getcwd()
     os.chdir(CONFIG['template_source'])
     os.system('git clone https://github.com/CenturyLinkCloud/pl-cloud-starter.git')
+
+    print("{} TODO: Remove after testing. Changing to dev branch".format(PREFIX))
+    os.system('git checkout groovy-generator')
+
     os.chdir(cwd)
+
+
+def commit_changes():
+    """ Commit all changes to git repo """
+    print("{} Committing project files to git".format(PREFIX))
+    os.system('git add --all')
+    os.system("git commit -am 'Initial {} template'".format(CONFIG['template_type']))
 
 
 def copy_template():
@@ -96,6 +107,15 @@ def gather_user_input():
 
     CONFIG['template_target'] = cwd
     CONFIG['github_repo_name'] = this_dir
+
+    while '' == CONFIG['template_type']:
+        template = input("{} Which template? [j]ava or [g]roovy: ".format(PREFIX))
+        if template in ['j', 'J']:
+            CONFIG['template_type'] = 'java-maven'
+        elif template in ['g', 'G']:
+            CONFIG['template_type'] = 'groovy-gradle'
+        else:
+            print("{} Invalid entry '{}'".format(PREFIX, template))
 
     CONFIG['domain'] = input("{} Enter your domain: ".format(PREFIX))
     CONFIG['subdomain'] = input("{} Enter your subdomain: ".format(PREFIX))
@@ -139,34 +159,40 @@ def replace_keywords():
         for file in files:
             os.system("sed -i '' 's/{}/{}/g' {} > /dev/null".format(k, v, file))
 
-    print("{} Updating directroy structure".format(PREFIX))
 
-    # Change dir to match java package name
-    base = 'src/main/java/io/ctl'
-    os.system("mv {}/platform/ {}/{}/".format(base, base, CONFIG['domain']))
+def update_directories():
+    """ Move template directories to ~~JAVA_PACKAGE~~ """
+    if CONFIG['template_type'] in ['java-maven', 'groovy-gradle']:
 
-    base = "src/main/java/io/ctl/{}".format(CONFIG['domain'])
-    os.system("mv {}/cloudStarterJava/ {}/{}/".format(base, base, CONFIG['java_package']))
+        print("{} Updating directroy structure".format(PREFIX))
 
-    base = 'src/test/java/io/ctl'
-    os.system("mv {}/platform/ {}/{}/".format(base, base, CONFIG['domain']))
+        if 'java-maven' == CONFIG['template_type']:
+            lang = 'java'
+        else:
+            lang = 'groovy'
 
-    base = "src/test/java/io/ctl/{}".format(CONFIG['domain'])
-    os.system("mv {}/cloudStarterJava/ {}/{}/".format(base, base, CONFIG['java_package']))
+        # move platform/cloudstarter to ~~DOMAIN~~/~~JAVA_PACKAGE~~
+        base = "src/main/{}/io/ctl".format(lang)
+        os.system("mv {}/platform/ {}/{}/".format(base, base, CONFIG['domain']))
 
-    # Rename helm/main to helm/~~GITHUB_REPO_NAME~~
-    os.system("mv helm/main helm/{}".format(CONFIG['github_repo_name']))
+        base = "src/main/{}/io/ctl/{}".format(lang, CONFIG['domain'])
+        os.system("mv {}/cloudstarter/ {}/{}/".format(base, base, CONFIG['java_package']))
 
-    print("{} Committing project files to git".format(PREFIX))
-    os.system('git add --all')
-    os.system("git commit -am 'Initial {} template'".format(CONFIG['template_type']))
+        base = "src/test/{}/io/ctl".format(lang)
+        os.system("mv {}/platform/ {}/{}/".format(base, base, CONFIG['domain']))
+
+        base = "src/test/{}/io/ctl/{}".format(lang, CONFIG['domain'])
+        os.system("mv {}/cloudstarter/ {}/{}/".format(base, base, CONFIG['java_package']))
+
+        # Rename helm/main to helm/~~GITHUB_REPO_NAME~~
+        os.system("mv helm/main helm/{}".format(CONFIG['github_repo_name']))
 
 
 def print_remaining_tasks():
     print("{} Next steps:".format(PREFIX))
     print("     1. Review code and refine naming as necessary")
     print("     2. Run project and test endpoints")
-    print("        * mvn spring-boot:run")
+    print("        * 'mvn spring-boot:run' OR './gradlew bootRun'")
     print("        * http://localhost:8080/actuator")
     print("        * http://localhost:8080/prometheus")
     print("        * http://localhost:8080/healthz/readiness")
@@ -194,9 +220,13 @@ def main():
     clone_template()
     copy_template()
     replace_keywords()
+    update_directories()
+    commit_changes()
 
     cleanup()
     print_remaining_tasks()
+
+    # TODO: Automate validation testing: start the project & curl the endpoints
 
 
 main()
